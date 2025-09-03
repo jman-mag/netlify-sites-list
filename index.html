@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Netlify Sites</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .site-card {
+            border: 1px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .site-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .site-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .site-url {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .site-url:hover {
+            text-decoration: underline;
+        }
+
+        .site-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            font-size: 0.9rem;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #4a5568;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            color: #718096;
+        }
+
+        .repo-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #f7fafc;
+            color: #4a5568;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .repo-link:hover {
+            background: #edf2f7;
+        }
+
+        .no-repo {
+            color: #a0aec0;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .last-updated {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .sites-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .site-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Netlify Sites</h1>
+            <p>A comprehensive list of all my deployed sites and their status</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number" id="total-sites">-</span>
+                    <span class="stat-label">Total Sites</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="recent-updates">-</span>
+                    <span class="stat-label">Updated This Week</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="with-repos">-</span>
+                    <span class="stat-label">With Repositories</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Sites</button>
+                <button class="filter-btn" data-filter="recent">Recently Updated</button>
+                <button class="filter-btn" data-filter="with-repo">With Repository</button>
+                <button class="filter-btn" data-filter="custom-domain">Custom Domains</button>
+            </div>
+
+            <input type="text" class="search-box" placeholder="Search sites by name or URL..." id="search-input">
+
+            <div id="sites-container">
+                <div class="loading">Loading sites...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allSites = [];
+        let filteredSites = [];
+
+        // Load and display sites
+        async function loadSites() {
+            try {
+                const response = await fetch('sites-processed.json');
+                allSites = await response.json();
+                filteredSites = [...allSites];
+                
+                updateStats();
+                renderSites();
+                setupEventListeners();
+            } catch (error) {
+                document.getElementById('sites-container').innerHTML = 
+                    '<div class="no-results">Error loading sites data. Please check the console.</div>';
+                console.error('Error loading sites:', error);
+            }
+        }
+
+        function updateStats() {
+            const totalSites = allSites.length;
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const recentUpdates = allSites.filter(site => new Date(site.updated_at) > oneWeekAgo).length;
+            const withRepos = allSites.filter(site => site.repo_url).length;
+
+            document.getElementById('total-sites').textContent = totalSites;
+            document.getElementById('recent-updates').textContent = recentUpdates;
+            document.getElementById('with-repos').textContent = withRepos;
+        }
+
+        function renderSites() {
+            const container = document.getElementById('sites-container');
+            
+            if (filteredSites.length === 0) {
+                container.innerHTML = '<div class="no-results">No sites found matching your criteria.</div>';
+                return;
+            }
+
+            const sitesHTML = filteredSites.map(site => {
+                const createdDate = new Date(site.created_at).toLocaleDateString();
+                const updatedDate = new Date(site.updated_at).toLocaleDateString();
+                const lastDeployDate = site.last_deploy_at ? new Date(site.last_deploy_at).toLocaleDateString() : 'N/A';
+                const timeSinceUpdate = getTimeSince(new Date(site.updated_at));
+
+                return `
+                    <div class="site-card">
+                        <div class="last-updated">${timeSinceUpdate}</div>
+                        <div class="site-name">${site.name}</div>
+                        <a href="${site.url}" target="_blank" class="site-url">${site.url}</a>
+                        
+                        <div class="site-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Created</span>
+                                <span class="meta-value">${createdDate}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Last Updated</span>
+                                <span class="meta-value">${updatedDate}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Last Deploy</span>
+                                <span class="meta-value">${lastDeployDate}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Status</span>
+                                <span class="meta-value">${site.state}</span>
+                            </div>
+                        </div>
+
+                        ${site.repo_url ? 
+                            `<a href="${site.repo_url}" target="_blank" class="repo-link">View Repository</a>` :
+                            `<span class="no-repo">No repository linked</span>`
+                        }
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="sites-grid">${sitesHTML}</div>`;
+        }
+
+        function getTimeSince(date) {
+            const now = new Date();
+            const diffInMs = now - date;
+            const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+            
+            if (diffInDays === 0) return 'Today';
+            if (diffInDays === 1) return 'Yesterday';
+            if (diffInDays < 7) return `${diffInDays} days ago`;
+            if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+            if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
+            return `${Math.floor(diffInDays / 365)} years ago`;
+        }
+
+        function filterSites(filter) {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            filteredSites = allSites.filter(site => {
+                const matchesSearch = site.name.toLowerCase().includes(searchTerm) || 
+                                    site.url.toLowerCase().includes(searchTerm);
+                
+                if (!matchesSearch) return false;
+                
+                switch (filter) {
+                    case 'recent':
+                        const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                        return new Date(site.updated_at) > oneWeekAgo;
+                    case 'with-repo':
+                        return site.repo_url !== null;
+                    case 'custom-domain':
+                        return site.custom_domain !== null;
+                    default:
+                        return true;
+                }
+            });
+            
+            renderSites();
+        }
+
+        function setupEventListeners() {
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    filterSites(e.target.dataset.filter);
+                });
+            });
+
+            // Search input
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                filterSites(activeFilter);
+            });
+        }
+
+        // Initialize the page
+        loadSites();
+    </script>
+</body>
+</html>
